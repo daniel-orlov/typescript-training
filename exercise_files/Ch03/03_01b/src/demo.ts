@@ -6,10 +6,15 @@ enum ContactStatus {
     New = "new"
 }
 
+// String literal type
+type ContactStatusString = "active" | "inactive" | "new";
+
+type ContactBirthDate = Date | string | number;
+
 interface Contact {
     id: number;
     name: ContactName;
-    birthDate?: Date;
+    birthDate?: ContactBirthDate;
     status?: ContactStatus;
 }
 
@@ -21,19 +26,23 @@ interface Address {
     postalCode: string;
 }
 
+interface AddressableContactViaExtension extends Contact, Address {
+}
+
+// Other way to define AddressableContact
+type AddressableContact = Contact & Address; // Intersection type
+
 function getBirthDate(contact: Contact) {
     if (typeof contact.birthDate === "number") {
         return new Date(contact.birthDate);
-    }
-    else if (typeof contact.birthDate === "string") {
-        return Date.parse(contact.birthDate)
-    }
-    else {
-        return contact.birthDate
+    } else if (typeof contact.birthDate === "string") {
+        return Date.parse(contact.birthDate);
+    } else {
+        return contact.birthDate;
     }
 }
 
 let primaryContact: Contact = {
     id: 12345,
     name: "Jamie Johnson"
-}
+};
