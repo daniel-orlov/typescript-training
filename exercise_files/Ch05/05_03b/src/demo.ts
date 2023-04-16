@@ -6,25 +6,37 @@ const currentUser = {
     id: 1234,
     roles: ["ContactEditor"],
     isAuthenticated(): boolean {
-        return true
+        return true;
     },
     isInRole(role: string): boolean {
         return this.roles.contains(role);
     }
+};
+
+function authorize(role: string) {
+    return function authorizeDecorator(target: any, property: string, descriptor: PropertyDescriptor) {
+        const wrapped = descriptor.value;
+
+        descriptor.value = function () {
+            if (!currentUser.isAuthenticated()) {
+                throw Error("User is not authenticated");
+            }
+
+            if (!currentUser.isInRole(role)) {
+                throw Error("User not authorized to execute this action");
+            }
+
+            return wrapped.apply(this, arguments);
+        };
+    };
 }
 
-function authorize(target: any, property: string, descriptor: PropertyDescriptor) {
-    const wrapped = descriptor.value
-
-    descriptor.value = function () {
-        if (!currentUser.isAuthenticated()) {
-            throw Error("User is not authenticated");
-        }
-
-        return wrapped.apply(this, arguments);
-    }
+function freeze(constructor: Function) {
+    Object.freeze(constructor);
+    Object.freeze(constructor.prototype);
 }
 
+@freeze
 class ContactRepository {
     private contacts: Contact[] = [];
 
@@ -34,8 +46,7 @@ class ContactRepository {
             throw Error("User not authorized to execute this action");
         }
 
-        const contact = this.contacts.find(x => x.id === id);
-        return contact;
+        return this.contacts.find(x => x.id === id);
     }
 
     @authorize("ContactEditor")
