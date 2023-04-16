@@ -1,7 +1,7 @@
-let x: Record<string, string | number | boolean | Function> = { name: "Wruce Bayne" }
-x.number = 1234
-x.active = true
-x.log = () => console.log("awesome!")
+let x: Record<string, string | number | boolean | Function> = {name: "Wruce Bayne"};
+x.number = 1234;
+x.active = true;
+x.log = () => console.log("awesome!");
 
 
 ////////////////////
@@ -22,11 +22,29 @@ interface Contact {
 }
 
 interface Query {
-    sort?: 'asc' | 'desc';
+    sort?: "asc" | "desc";
+
     matches(val): boolean;
 }
 
-type ContactQuery = Record<keyof Contact, Query>
+// type ContactQuery = Partial<Record<keyof Contact, Query>> // Partial wrapper makes all properties optional
+//
+// type ContactQuery = Omit<
+//     Partial<
+//         Record<keyof Contact, Query>
+//     >, // Partial wrapper makes all properties optional
+//     "address" | "status" // Omit omits this properties
+// >
+
+type ContactQuery = Partial<
+    Pick< // Picks the properties one by one
+        Record<keyof Contact, Query>,
+        "id" | "name"
+    >
+>
+
+type RequiredContactQuery = Required<ContactQuery>
+
 
 function searchContacts(contacts: Contact[], query: ContactQuery) {
     return contacts.filter(contact => {
@@ -40,13 +58,13 @@ function searchContacts(contacts: Contact[], query: ContactQuery) {
         }
 
         return false;
-    })
+    });
 }
 
 const filteredContacts = searchContacts(
     [/* contacts */],
     {
-        id: { matches: (id) => id === 123 },
-        name: { matches: (name) => name === "Carol Weaver" },
+        id: {matches: (id) => id === 123},
+        name: {matches: (name) => name === "Carol Weaver"},
     }
 );
