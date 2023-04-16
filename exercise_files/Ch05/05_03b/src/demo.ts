@@ -36,7 +36,24 @@ function freeze(constructor: Function) {
     Object.freeze(constructor.prototype);
 }
 
+function singleton<T extends { new(...args: any[]): {} }>(constructor: T) {
+    return class Singleton extends constructor {
+        private static instance: null | Singleton = null;
+
+        constructor(...args: any[]) {
+            super(...args);
+
+            if (!Singleton.instance) {
+                Singleton.instance = new constructor(...args);
+            }
+
+            return Singleton.instance;
+        }
+    };
+}
+
 @freeze
+@singleton
 class ContactRepository {
     private contacts: Contact[] = [];
 
