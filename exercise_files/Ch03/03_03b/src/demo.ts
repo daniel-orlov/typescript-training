@@ -1,8 +1,7 @@
-const x = "string"
-const y = true
-console.log(typeof x) // --> "string"
-console.log(typeof y) // --> "boolean"
-
+const x = "string";
+const y = true;
+console.log(typeof x); // --> "string"
+console.log(typeof y); // --> "boolean"
 
 
 type ContactName = string;
@@ -16,19 +15,23 @@ interface Contact {
     status?: ContactStatus;
 }
 
-function toContact(nameOrContact) {
+function toContact(nameOrContact: string | Contact): Contact {
     if (typeof nameOrContact === "object") {
         return {
             id: nameOrContact.id,
             name: nameOrContact.name,
             status: nameOrContact.status
-        }
-    }
-    else {
+        };
+    } else {
         return {
             id: 0,
             name: nameOrContact,
             status: "active"
-        }
+        };
     }
+}
+
+const myType = {min: 1, max: 300};
+
+function save(source: typeof myType) {
 }
